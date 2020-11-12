@@ -6,8 +6,9 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import matplotlib.pyplot as plt
-from statsmodels.tsa.arima_model import ARIMA
+from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
+import statsmodels.api as sm
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from pmdarima.arima import auto_arima
@@ -43,11 +44,6 @@ class Train_Dialog(QDialog):
             self.Volume_combobox
         ]
         self.Train_pushButton.clicked.connect(self.LSTM_Train)
-        try:
-            self.data = parent.series_1
-        except:
-            QMessageBox.about(self, "Alert", "분석하고 싶은 파일을 먼저 불러와주세요")
-            return
 
         self.LSTM_setupUI()
         self.parent = parent
@@ -55,7 +51,18 @@ class Train_Dialog(QDialog):
         self.d_value = 0
         self.q_value = 0
         self.c_nc = 'c'
-        self.day = 1
+        self.day = 12
+        self.fig = plt.Figure()
+        self.fig.set_facecolor("none")
+        self.fig2 = plt.Figure()
+        self.fig2.set_facecolor("none")
+        self.canvas = FigureCanvas(self.fig)
+        self.canvas2 = FigureCanvas(self.fig2)
+        self.canvas2.hide()
+        self.arima_gridLayout.addWidget(self.canvas)
+        self.arima_gridLayout.addWidget(self.canvas2)
+        # self.plus_pushButton.clicked.connect(self.plus_Btn_pushed)
+        # self.minus_pushButton.clicked.connect(self.minus_Btn_pushed)
 
         for i in self.data.columns:
             self.comboBox_x.addItem(i)
@@ -63,8 +70,13 @@ class Train_Dialog(QDialog):
 
         self.show()
         self.model_save_pushButton.clicked.connect(self.model_save_pushed)
+        self.progressBar.hide()
         self.Run_pushButton.clicked.connect(self.Run_Dialog)
         self.auto_arima_pushButton.clicked.connect(self.auto_arima_pushed)
+
+        self.rmse_label.setMinimumWidth(self.w // 3 * 0.8)
+        self.arima_groupBox.setMinimumWidth(self.w // 2 * 0.9)
+        self.groupBox.setMinimumWidth(self.w // 2 * 0.9)
 
     def Run_Dialog(self):
         if self.studying_rate.text() == '':
@@ -119,47 +131,82 @@ class Train_Dialog(QDialog):
         return yhat + history[-interval]
 
     def ARIMA_run(self, series):
-        self.rmse_label.clear()
         if self.comboBox_x.currentText() == self.comboBox_y.currentText():
             QMessageBox.about(self, "Alert", "x축 y축을 다르게 설정해주세요.")
             return
-        X = series.values
-        X = X.astype('float32')
-        months_in_year = self.day
-        series_studying = X[:self.studying_rate_length]
-        series_verification = X[self.studying_rate_length:
+        
+        self.rmse_label.clear()
+        self.fig.clear()
+        self.fig2.clear()
+        
+        try:
+            series[self.comboBox_x.currentText()] = pd.to_datetime(
+                series[self.comboBox_x.currentText()])
+            series.set_index(self.comboBox_x.currentText(), inplace=True)
+        except:
+            pass
+        # X = series.values
+        series.astype('float32')
+        print(series)
+        print('hi')
+        # if self.c_nc_comboBox.currentText() == '일간':
+        #     self.day = 'D'
+        # elif self.c_nc_comboBox.currentText() == '주간':
+        #     self.day = 'W'
+        # elif self.c_nc_comboBox.currentText() == '월간':
+        #     self.day = 'M'
+        # elif self.c_nc_comboBox.currentText() == '분기':
+        #     self.day = 'Q'
+        # else:
+        #     self.day = 'A'
+        months_in_year = 1
+        series_studying = series[:self.studying_rate_length]
+        series_verification = series[self.studying_rate_length:
                                 self.studying_rate_length+self.verification_rate_length]
-        series_test = series.iloc[self.studying_rate_length +
+        series_test = series[self.studying_rate_length +
                                   self.verification_rate_length:]
 
         len_arr = len(series_verification)
+        self.progressBar.setMaximum(len_arr)
+        self.progressBar.show()
 
         # 아리마 분석
         history = [x for x in series_studying]
         predictions = list()
         diff = self.difference(history, months_in_year)
-        model = ARIMA(diff, order=(self.p_value, self.d_value, self.q_value))
-        model_fit = model.fit(trend=self.c_nc, disp=0)
-        yhat = float(model_fit.forecast()[0])
+        print(self.day)
+        # model = ARIMA(diff, order=(self.p_value, self.d_value, self.q_value), freq=self.day)
+        model = sm.tsa.statespace.SARIMAX(diff, order=(self.p_value, self.d_value, self.q_value), seasonal_order=(self.p_value, self.d_value, self.q_value,12))
+        model_fit = model.fit()
+        yhat = model_fit.predict()
         yhat = self.inverse_difference(history, yhat, months_in_year)
-        predictions.append(yhat)
-        history.append(series_verification[0])
+        predictions.append(yhat[0])
+        print(series_verification)
+        history.append(series_verification.iloc[0])
+        self.time = self.progressBar.value()
+        self.time += 1
+        self.progressBar.setValue(self.time)
+
         for i in range(1, len(series_verification)):
             diff = self.difference(history, months_in_year)
             print(diff)
-            model = ARIMA(diff, order=(
-                self.p_value, self.d_value, self.q_value))
-            self.model_fit = model.fit(trend=self.c_nc, disp=0)
-            yhat = self.model_fit.forecast()[0]
+            # model = ARIMA(diff, order=(
+            #     self.p_value, self.d_value, self.q_value))
+            model = sm.tsa.statespace.SARIMAX(diff, order=(self.p_value, self.d_value, self.q_value), seasonal_order=(self.p_value, self.d_value, self.q_value,12))
+            self.model_fit = model.fit()
+            yhat = self.model_fit.predict()
             print(yhat)
             yhat = self.inverse_difference(history, yhat, months_in_year)
             predictions.append(yhat[0])
-            history.append(series_verification[i])
-            print(series_verification[i])
+            history.append(series_verification.iloc[i])
+            print(series_verification.iloc[i])
             print(f'총 {len_arr} 학습 중 {i}번 째 학습 중{yhat}')
-            self.rmse_label.setText(f'총 {len_arr} 학습 중 {i}번 째 학습 중{yhat}')
+            self.rmse_label.setText(f'총 {len_arr} 학습 중 {i}번 째 학습 중')
+            self.time += 1
+            self.progressBar.setValue(self.time)
 
-        forecast = self.model_fit.predict()
+        # forecast = self.model_fit.predict()
+        print(predictions)
 
         # model_fit.plot_predict()
         # fore = self.model_fit.forecast(steps=len_arr)
@@ -168,16 +215,32 @@ class Train_Dialog(QDialog):
         if len(predictions) == 1:
             print(predictions)
         else:
-            # x = pd.Series(predictions, index=series_verification.index)
+            x = pd.Series(predictions, index=series_verification.index)
+            print(x)
+            print(series_verification)
             self.rmse = sqrt(mean_squared_error(
-                series_verification, predictions))
+                series_verification, x))
         self.rmse_label.setText('rmse: '+str(self.rmse))
 
         # print(f'예측값 : {self.predict_value}')
         print('end')
-        plt.plot(series_verification)
-        plt.plot(predictions, color='red')
-        plt.show()
+        ax = self.fig.add_subplot(1, 1, 1)
+        self.fig.set_facecolor("white")
+        ax.plot(series_studying)
+        ax.plot(series_verification)
+        ax.plot(x, color='red')
+        ax.grid()
+        ax2 = self.fig2.add_subplot(1, 1, 1)
+        self.fig2.set_facecolor("white")
+        ax2.plot(series_verification)
+        ax2.plot(x, color='red')
+        ax2.grid()
+
+        self.canvas.draw()
+        self.canvas2.draw()
+        self.time = 0
+        self.progressBar.setValue(self.time)
+        self.progressBar.hide()
 
     def model_save_pushed(self):
         model = self.model_fit
@@ -204,6 +267,9 @@ class Train_Dialog(QDialog):
 
     def auto_arima_run(self, data):
         self.rmse_label.clear()
+        self.fig.clear()
+        self.fig2.clear()
+        
         # self.adf_test_label.clear()
         try:
             data[self.comboBox_x.currentText()] = pd.to_datetime(
@@ -214,13 +280,10 @@ class Train_Dialog(QDialog):
         # adf_test = ADFTest(alpha = 0.05)
         # self.adf_test_label.setText(str(adf_test.should_diff(data)))
 
-        train = data[:self.studying_rate_length]
-        test = data[self.studying_rate_length:self.studying_rate_length +
-                    self.verification_rate_length]
-        last = data[self.studying_rate_length+self.verification_rate_length:]
-        plt.plot(train)
-        plt.plot(test)
-        arima_model1 = auto_arima(data, start_p=0, d=1, start_q=0,
+        train = data[:self.studying_rate_length + self.verification_rate_length]
+        test = data[self.studying_rate_length+self.verification_rate_length:]
+        # last = data[self.studying_rate_length+self.verification_rate_length:]
+        arima_model1 = auto_arima(train, start_p=0, d=1, start_q=0,
                                   max_p=3, max_d=3, max_q=3, m=12,
                                   start_P=0, D=1, start_Q=0,
                                   max_P=3, max_D=3, max_Q=3,
@@ -241,7 +304,7 @@ class Train_Dialog(QDialog):
 
         # arima_model2.summary()
 
-        a = arima_model1.fit(train)
+        self.model_fit = arima_model1
         # b = arima_model2.fit(train)
         # model = ARIMA(train, order=(1,1,5))
         # model = model.fit()
@@ -250,7 +313,7 @@ class Train_Dialog(QDialog):
         # test.plot(legend=True)
 
         prediction1 = pd.DataFrame(
-            a.predict(n_periods=len(test)), index=test.index)
+            self.model_fit.predict(n_periods=len(test)), index=test.index)
         prediction1.columns = [self.comboBox_y.currentText()]
         rmse1 = sqrt(mean_squared_error(
             test, prediction1[self.comboBox_y.currentText()]))
@@ -269,9 +332,17 @@ class Train_Dialog(QDialog):
         # else:
         #     self.rmse = rmse2
         #     self.prediction = prediction2
-        plt.plot(prediction1)
-        fig = plt.Figure()
-        plt.show()
+        ax = self.fig.add_subplot(1, 1, 1)
+        ax.plot(train)
+        ax.plot(test)
+        ax.plot(prediction1)
+        ax.grid()
+        ax2 = self.fig2.add_subplot(1, 1, 1)
+        ax2.plot(test)
+        ax2.plot(prediction1)
+        ax2.grid()
+        self.canvas.draw()
+        self.canvas2.draw()
 
     def LSTM_setupUI(self):
         for combo in self.LSTMcomboboxes:
@@ -328,3 +399,11 @@ class Train_Dialog(QDialog):
         Model_path = QFileDialog.getExistingDirectory(self, 'Open Folder', '')
         LSTM.Train(stock_file, epoch_num, learning_rate,
                    seq_length, train_ratio, Model_name, Model_path)
+
+    def plus_Btn_pushed(self):
+        self.canvas.hide()
+        self.canvas2.show()
+
+    def minus_Btn_pushed(self):
+        self.canvas2.hide()
+        self.canvas.show()

@@ -29,87 +29,42 @@ class new_Dialog(QDialog):
         self.data = parent.series_1
         self.r = parent.r
         self.c = parent.c
-        self.setupUI(self.data, self.r, self.c)
-
-        self.show()
-
-    def setupUI(self, data, r, c):
-        # 컬럼명 변경
-        self.formLayout = QFormLayout(self.scrollAreaWidgetContents_2)
-        self.formLayout.setObjectName("formLayout")
-        for idx in range(c):
-            self.label = QLabel(self.scrollAreaWidgetContents_2)
-            self.label.setMinimumSize(QSize(0, 30))
-            self.label.setObjectName(f"label_{idx}")
-            self.formLayout.setWidget(idx, QFormLayout.LabelRole, self.label)
-            self.label.setText(data.columns[idx])
-
-            self.lineEdit = QLineEdit(self.scrollAreaWidgetContents_2)
-            self.lineEdit.setMinimumSize(QSize(0, 30))
-            # self.lineEdit.setMaximumSize(QSize(200, 100))
-            self.lineEdit.setObjectName(f"lineEdit_{idx}")
-            self.formLayout.setWidget(
-                idx, QFormLayout.FieldRole, self.lineEdit)
-        self.pushButton = QPushButton('변경', self.groupBox_2)
-        self.pushButton.setObjectName("changeButton")
-        self.pushButton.clicked.connect(
-            lambda state, c=c: self.changeTextFunction(state, r, c, data))
-        self.pushButton.setMaximumWidth(100)
-        self.gridLayout_4.addWidget(self.pushButton, 2, 0, 1, 1, Qt.AlignRight)
-
-        self.Save_Button.clicked.connect(self.saveFunction)
-        self.Training_Button.clicked.connect(self.training_btn)
-
-        # self.vbox = QVBoxLayout()
-        # for i in range(c):
-        #     self.checkbox = QCheckBox()
-        #     self.checkbox.setMinimumSize(QSize(0, 30))
-        #     self.checkbox.setObjectName(f"checkbox_{idx}")
-        #     self.checkbox.setText(data.columns[i])
-        #     self.vbox.addWidget(self.checkbox)
-        #     self.groupBox_3.setLayout(self.vbox)
-
-
         self.fig = plt.Figure()
-        ax = self.fig.add_subplot(111, )
-        ax.grid()
-
-        missing = data.isnull().sum()
-        x_val = []
-        y_val = []
-        # print(data.columns)
-        for i in range(data.shape[1]):
-            cnt = data[data.columns[i]].isnull().sum()
-            if cnt:
-                x_val.append(data.columns[i])
-                y_val.append(cnt)
-            else:
-                x_val.append(data.columns[i])
-                y_val.append(0)
-
-        try:
-            missing = missing[missing > 0]
-            missing.sort_values(inplace=True)
-            ax.barh(x_val, y_val)
-            ax.set_xlabel('개수')
-            ax.set_xlim([0, data.shape[0]])
-            for i, v in enumerate(x_val):
-                ax.text(y_val[i], v, str(y_val[i]))
-        except:
-            ax.bar(x_val, y_val)
-            ax.set_xlabel('Column')
-            ax.set_ylabel('개수')
-            for i, v in enumerate(x_val):
-                ax.text(y_val[i], v, str(y_val[i]))
-
         self.canvas = FigureCanvas(self.fig)
         self.graph_view.addWidget(self.canvas)
         self.graph_frame.addLayout(self.graph_view)
         self.setLayout(self.graph_frame)
 
+        self.setupUI(self.data, self.r, self.c)
+
+        self.show()
+
+    def setupUI(self, data, r, c):
+        origin_data = self.data
+        origin_col = self.c
+        self.changeheader()
+
+        self.Save_Button.clicked.connect(self.saveFunction)
+        self.Training_Button.clicked.connect(self.training_btn)
+
+        self.formLayout_3 = QFormLayout(self.scrollAreaWidgetContents)
+        self.formLayout_3.setObjectName("formLayout_3")
+        for i in range(c):
+            self.checkbox = QCheckBox(self.scrollAreaWidgetContents)
+            self.checkbox.setMinimumSize(QSize(0, 30))
+            self.checkbox.setObjectName(f"checkbox_{i}")
+            self.checkbox.setText(data.columns[i])
+            self.formLayout_3.setWidget(i, QFormLayout.LabelRole, self.checkbox)
+
+        self.del_Col.clicked.connect(self.del_columns)
+        self.reset_Col.clicked.connect(lambda state, origin_data=origin_data: self.all_reset(state, origin_data, origin_col))
+
+        self.draw_graph()
+
+        
+
 
         # 결측치 처리
-        origin_data = self.data
         self.text = self.data.isnull().sum()
         self.formLayout_2 = QFormLayout(self.scrollAreaWidgetContents_3)
         self.formLayout_2.setObjectName("formLayout_2")
@@ -129,7 +84,7 @@ class new_Dialog(QDialog):
             self.combo.addItem('중앙값으로 대체')
             self.formLayout_2.setWidget(i, QFormLayout.FieldRole, self.combo)
         self.radioButton.setChecked(True)
-        self.process_Button.clicked.connect(self.process_btn)
+        self.process_Button.clicked.connect(lambda state, origin_col=origin_col: self.process_btn(state, origin_col))
         self.reset_Button.clicked.connect(
             lambda state, origin_data=origin_data: self.reset_btn(state, origin_data))
 
@@ -148,24 +103,51 @@ class new_Dialog(QDialog):
                     i, j, QTableWidgetItem(str(data.iloc[i, j])))
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
+        self.groupBox.setMinimumWidth(self.w // 3 * 0.9)
+        self.groupBox_2.setMinimumWidth(self.w // 3 * 0.9)
+        self.groupBox_3.setMinimumWidth(self.w // 3 * 0.9)
+        self.groupBox_4.setMinimumWidth(self.w // 2 * 0.9)
+        self.groupBox_5.setMinimumWidth(self.w // 2 * 0.9)
+
+    def changeheader(self):
+        # 컬럼명 변경
+        self.formLayout = QFormLayout(self.scrollAreaWidgetContents_2)
+        self.formLayout.setObjectName("formLayout")
+        for idx in range(self.c):
+            self.label = QLabel(self.scrollAreaWidgetContents_2)
+            self.label.setMinimumSize(QSize(0, 30))
+            self.label.setObjectName(f"label_{idx}")
+            self.formLayout.setWidget(idx, QFormLayout.LabelRole, self.label)
+            self.label.setText(self.data.columns[idx])
+
+            self.lineEdit = QLineEdit(self.scrollAreaWidgetContents_2)
+            self.lineEdit.setMinimumSize(QSize(0, 30))
+            self.lineEdit.setObjectName(f"lineEdit_{idx}")
+            self.formLayout.setWidget(
+                idx, QFormLayout.FieldRole, self.lineEdit)
+        self.pushButton = QPushButton('변경', self.groupBox_2)
+        self.pushButton.setObjectName("changeButton")
+        self.pushButton.clicked.connect(self.changeTextFunction)
+        self.pushButton.setMaximumWidth(100)
+        self.gridLayout_4.addWidget(self.pushButton, 2, 0, 1, 1, Qt.AlignRight)
+
     # 컬럼 header 변경
-    def changeTextFunction(self, state, r, c, data):
-        for i in range(c):
+    def changeTextFunction(self):
+        for i in range(self.c):
             text = self.findChild(QLineEdit, f"lineEdit_{i}").text()
             if text != '':
-                data.columns.values[i] = text
-        self.tableWidget.setHorizontalHeaderLabels(data.columns)
+                self.data.columns.values[i] = text
+        self.tableWidget.setHorizontalHeaderLabels(self.data.columns)
 
     # Tabel cell 내용 변경
-    def changeTableCells(self):
-        for i in range(self.r):
-            for j in range(self.c):
-                self.tableWidget.setItem(
-                    i, j, QTableWidgetItem(str(self.data.iloc[i, j])))
+    def changeTableCells(self, r, c):
+        for i in range(r):
+            for j in range(c):
+                self.tableWidget.setItem(i, j, QTableWidgetItem(str(self.data.iloc[i, j])))
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
     # 전처리
-    def process_btn(self):
+    def process_btn(self, state, origin_col):
         if self.radioButton.isChecked():
             if self.all_comboBox.currentText() == '제거':
                 self.data = self.data.dropna()
@@ -179,25 +161,135 @@ class new_Dialog(QDialog):
                 self.data = round(self.data.fillna(self.data.median()))
 
         else:
-            for i in range(c):
-                combo = self.findChild(
-                    QComboBox, f"comboBox_{i}").currentText()
-                if combo == '제거':
-                    data = data.dropna(subset=[data.columns[i]])
-                elif combo == '0으로 대체':
-                    data[data.columns[i]] = data[data.columns[i]].fillna(0)
-                elif combo == '평균값으로 대체':
-                    data[data.columns[i]] = data[data.columns[i]].fillna(
-                        data[data.columns[i]].mean())
-                elif combo == '중앙값으로 대체':
-                    data[data.columns[i]] = round(
-                        data[data.columns[i]].fillna(data[data.columns[i]].median()))
-        return self.changeTableCells()
+            n = 0
+            for i in range(origin_col):
+                combo = self.findChild(QComboBox, f"comboBox_{i}")
+                if combo == None:
+                    n += 1
+                if combo != None:
+                    combo = combo.currentText()
+                    if combo == '제거':
+                        self.data = self.data.dropna(subset=[self.data.columns[i - n]])
+                        self.r = self.data.shape[0]
+                    elif combo == '0으로 대체':
+                        self.data[self.data.columns[i - n]] = self.data[self.data.columns[i - n]].fillna(0)
+                    elif combo == '평균값으로 대체':
+                        self.data[self.data.columns[i - n]] = self.data[self.data.columns[i - n]].fillna(
+                            self.data[self.data.columns[i - n]].mean())
+                    elif combo == '중앙값으로 대체':
+                        self.data[self.data.columns[i - n]] = round(
+                            self.data[self.data.columns[i - n]].fillna(self.data[self.data.columns[i - n]].median()))
+        return self.changeTableCells(self.r, self.c), self.draw_graph()
+
+    # graph 그리기
+    def draw_graph(self):
+        self.fig.clear()
+        ax = self.fig.add_subplot(1, 1, 1)
+
+        missing = self.data.isnull().sum()
+        x_val = []
+        y_val = []
+        for i in range(self.data.shape[1]):
+            cnt = self.data[self.data.columns[i]].isnull().sum()
+            if cnt:
+                x_val.append(self.data.columns[i])
+                y_val.append(cnt)
+            else:
+                x_val.append(self.data.columns[i])
+                y_val.append(0)
+
+        try:
+            missing = missing[missing > 0]
+            missing.sort_values(inplace=True)
+            # ax.barh(x_val, y_val)
+            # ax.set_xlabel('개수')
+            # ax.set_xlim([0, self.data.shape[0]])
+            ax.bar(x_val, y_val)
+            ax.set_ylabel('개수')
+            # ax.set_ylim([0, self.data.shape[0]])
+            for i, v in enumerate(x_val):
+                # ax.text(y_val[i], v, str(y_val[i]))
+                ax.text(v, y_val[i], str(y_val[i]))
+            plt.bar(x_val, y_val)
+
+        except:
+            ax.bar(x_val, y_val)
+            ax.set_xlabel('Column')
+            ax.set_ylabel('개수')
+            for i, v in enumerate(x_val):
+                ax.text(y_val[i], v, str(y_val[i]))
+
+        # self.canvas = FigureCanvas(self.fig)
+        ax.grid()
+        self.canvas.draw()
+        # self.graph_view.addWidget(self.canvas)
+        # self.graph_frame.addLayout(self.graph_view)
+        # self.setLayout(self.graph_frame)
+
+    # column 삭제
+    def del_columns(self):
+        cnt = 0
+        
+        for i in range(self.c):
+            if self.findChild(QCheckBox, f"checkbox_{i}").isChecked():
+                col_name = self.findChild(QCheckBox, f"checkbox_{i}").text()
+                self.data = self.data.drop(col_name, axis=1)
+                label = self.formLayout.labelForField(self.findChild(QLineEdit, f"lineEdit_{i}"))
+                label.deleteLater()
+                self.findChild(QLineEdit, f"lineEdit_{i}").deleteLater()
+                combo_label = self.formLayout_2.labelForField(self.findChild(QComboBox, f"comboBox_{i}"))
+                combo_label.deleteLater()
+                self.findChild(QComboBox, f"comboBox_{i}").deleteLater()
+                self.findChild(QCheckBox, f"checkbox_{i}").deleteLater()
+                cnt += 1
+        self.c -= cnt
+        self.tableWidget.clear()
+        self.tableWidget.setHorizontalHeaderLabels(self.data.columns)
+        return self.changeTableCells(self.r, self.c), self.draw_graph()
 
     # 데이터 초기화
     def reset_btn(self, state, origin_data):
         self.data = origin_data
-        return self.changeTableCells()
+        return self.changeTableCells(self.r, self.c), self.draw_graph()
+
+    # column 초기화
+    def all_reset(self, state, origin_data, origin_col):
+        self.data = origin_data
+        self.c = origin_col
+        for i in range(self.c):
+            if self.findChild(QLabel, f"label_{i}") == None:
+                self.label = QLabel(self.scrollAreaWidgetContents_2)
+                self.label.setMinimumSize(QSize(0, 30))
+                self.label.setObjectName(f"label_{i}")
+                self.formLayout.setWidget(i, QFormLayout.LabelRole, self.label)
+                self.label.setText(self.data.columns[i])
+                self.lineEdit = QLineEdit(self.scrollAreaWidgetContents_2)
+                self.lineEdit.setMinimumSize(QSize(0, 30))
+                self.lineEdit.setObjectName(f"lineEdit_{i}")
+                self.formLayout.setWidget(i, QFormLayout.FieldRole, self.lineEdit)
+
+                self.label = QLabel(self.scrollAreaWidgetContents_3)
+                self.label.setMinimumSize(QSize(0, 30))
+                self.label.setObjectName(f'label_{i}')
+                self.formLayout_2.setWidget(i, QFormLayout.LabelRole, self.label)
+                self.label.setText(self.data.columns[i])
+
+                self.combo = QComboBox(self.scrollAreaWidgetContents_3)
+                self.combo.setMinimumHeight(30)
+                self.combo.setObjectName(f'comboBox_{i}')
+                self.combo.addItem('제거')
+                self.combo.addItem('0으로 대체')
+                self.combo.addItem('평균값으로 대체')
+                self.combo.addItem('중앙값으로 대체')
+                self.formLayout_2.setWidget(i, QFormLayout.FieldRole, self.combo)
+
+                self.checkbox = QCheckBox(self.scrollAreaWidgetContents)
+                self.checkbox.setMinimumSize(QSize(0, 30))
+                self.checkbox.setObjectName(f"checkbox_{i}")
+                self.checkbox.setText(self.data.columns[i])
+                self.formLayout_3.setWidget(i, QFormLayout.LabelRole, self.checkbox)
+        self.tableWidget.setHorizontalHeaderLabels(self.data.columns)
+        return self.changeTableCells(self.r, self.c), self.draw_graph()
 
     # 데이터 저장
     def saveFunction(self):

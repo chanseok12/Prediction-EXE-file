@@ -6,12 +6,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-
 import PyQt5
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
+from qdarkstyle import *
 
 import Data_Predict
 Main_ui = '../_uiFiles/Main.ui'
@@ -22,19 +22,22 @@ class MyWindow(QMainWindow):
         QMainWindow.__init__(self, None)
         uic.loadUi(Main_ui, self)
         self.setWindowTitle("S-Prediction")
-        self.setWindowIcon(QIcon("../images/icon.ico"))
+        
         self.showMaximized()
 
         self.setWindowIcon(QIcon("../images/web_icon.png"))
 
         self.Dataset_pushButton.setStyleSheet(
-            "image:url(../images/dataset.webp); background-color:white; border:0px;")
+            'QPushButton{image:url(../images/dataset2.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url(../images/dataset2.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
         self.Training_pushButton.setStyleSheet(
-            "image:url(../images/Training.png); background-color:white; border:0px;")
-        # self.Test_pushButton.setStyleSheet(
-        #     "image:url(../images/dataset.webp); background-color:white; border:0px;")
+            'QPushButton{image:url(../images/traing3.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url(../images/traing3.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
         self.Test_pushButton.setStyleSheet(
-            "image:url(../images/test.png); background-color:white; border:0px;")
+            'QPushButton{image:url(../images/prediction6.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url(../images/prediction6.webp); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
+        
+        self.arrow1.setStyleSheet(
+            "image:url(../images/arrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
+        self.arrow2.setStyleSheet(
+            "image:url(../images/arrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
         self.Dataset_pushButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.Training_pushButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.Test_pushButton.setCursor(QCursor(Qt.PointingHandCursor))
@@ -105,7 +108,7 @@ class MyWindow(QMainWindow):
 
 app = QApplication(sys.argv)
 window = MyWindow()
-
+app.setStyleSheet(load_stylesheet())
 window.show()
 
 sys.exit(app.exec_())

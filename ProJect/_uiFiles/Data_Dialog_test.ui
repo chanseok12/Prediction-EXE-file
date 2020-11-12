@@ -28,7 +28,7 @@
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
+     <item row="2" column="0">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <spacer name="horizontalSpacer_2">
@@ -88,12 +88,12 @@
        <item>
         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0" columnstretch="0">
          <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
+          <layout class="QGridLayout" name="gridLayout_12">
+           <item row="0" column="0">
             <widget class="QGroupBox" name="groupBox_2">
              <property name="maximumSize">
               <size>
-               <width>387</width>
+               <width>16777215</width>
                <height>16777215</height>
               </size>
              </property>
@@ -111,8 +111,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>361</width>
-                   <height>385</height>
+                   <width>493</width>
+                   <height>370</height>
                   </rect>
                  </property>
                 </widget>
@@ -121,11 +121,11 @@
              </layout>
             </widget>
            </item>
-           <item>
+           <item row="0" column="1">
             <widget class="QGroupBox" name="groupBox">
              <property name="maximumSize">
               <size>
-               <width>387</width>
+               <width>16777215</width>
                <height>16777215</height>
               </size>
              </property>
@@ -135,62 +135,49 @@
              <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="0">
                <layout class="QGridLayout" name="gridLayout_6">
-                <item row="3" column="0">
-                 <widget class="QScrollArea" name="scrollArea_2">
-                  <property name="widgetResizable">
-                   <bool>true</bool>
-                  </property>
-                  <widget class="QWidget" name="scrollAreaWidgetContents_3">
-                   <property name="geometry">
-                    <rect>
-                     <x>0</x>
-                     <y>0</y>
-                     <width>359</width>
-                     <height>266</height>
-                    </rect>
-                   </property>
-                  </widget>
-                 </widget>
-                </item>
                 <item row="0" column="0">
-                 <widget class="QRadioButton" name="radioButton">
-                  <property name="text">
-                   <string>모든 Column 결측 처리</string>
-                  </property>
-                 </widget>
+                 <layout class="QFormLayout" name="formLayout">
+                  <item row="0" column="0">
+                   <widget class="QRadioButton" name="radioButton">
+                    <property name="text">
+                     <string>모든 Column 결측 처리</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QComboBox" name="all_comboBox">
+                    <item>
+                     <property name="text">
+                      <string>제거</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>0으로 대체</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>평균값으로 대체</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>중앙값으로 대체</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
                 </item>
-                <item row="1" column="0">
-                 <widget class="QComboBox" name="all_comboBox">
-                  <item>
-                   <property name="text">
-                    <string>제거</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>0으로 대체</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>평균값으로 대체</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>중앙값으로 대체</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="2" column="0">
+                <item row="3" column="0">
                  <widget class="QRadioButton" name="radioButton_2">
                   <property name="text">
                    <string>Column 별 결측 처리</string>
                   </property>
                  </widget>
                 </item>
-                <item row="4" column="0">
+                <item row="5" column="0">
                  <layout class="QGridLayout" name="gridLayout_8">
                   <item row="0" column="2">
                    <widget class="QPushButton" name="process_Button">
@@ -233,41 +220,97 @@
                   </item>
                  </layout>
                 </item>
+                <item row="4" column="0">
+                 <widget class="QScrollArea" name="scrollArea_2">
+                  <property name="widgetResizable">
+                   <bool>true</bool>
+                  </property>
+                  <widget class="QWidget" name="scrollAreaWidgetContents_3">
+                   <property name="geometry">
+                    <rect>
+                     <x>0</x>
+                     <y>0</y>
+                     <width>490</width>
+                     <height>275</height>
+                    </rect>
+                   </property>
+                  </widget>
+                 </widget>
+                </item>
                </layout>
               </item>
              </layout>
             </widget>
            </item>
-           <item>
+           <item row="0" column="2">
             <widget class="QGroupBox" name="groupBox_3">
              <property name="maximumSize">
               <size>
-               <width>387</width>
+               <width>16777215</width>
                <height>16777215</height>
               </size>
              </property>
              <property name="title">
               <string>Column 제거</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_9"/>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_4">
-             <property name="maximumSize">
-              <size>
-               <width>387</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>결측치 시각화</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_10">
-              <item row="0" column="0">
-               <layout class="QHBoxLayout" name="graph_frame">
+             <layout class="QGridLayout" name="gridLayout_9">
+              <item row="0" column="1">
+               <widget class="QScrollArea" name="scrollArea_3">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>493</width>
+                   <height>333</height>
+                  </rect>
+                 </property>
+                </widget>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
-                 <layout class="QVBoxLayout" name="graph_view"/>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="reset_Col">
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>초기화</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="del_Col">
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>처리</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -279,20 +322,61 @@
         </layout>
        </item>
        <item>
-        <widget class="QTableWidget" name="tableWidget">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>400</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>400</height>
-          </size>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QGroupBox" name="groupBox_5">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>DataSet</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_11">
+            <item row="0" column="0">
+             <widget class="QTableWidget" name="tableWidget">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="title">
+            <string>결측치 시각화</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_10">
+            <item row="0" column="0">
+             <layout class="QHBoxLayout" name="graph_frame">
+              <item>
+               <layout class="QVBoxLayout" name="graph_view"/>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -302,13 +386,10 @@
  </widget>
  <tabstops>
   <tabstop>scrollArea</tabstop>
-  <tabstop>radioButton</tabstop>
-  <tabstop>all_comboBox</tabstop>
   <tabstop>radioButton_2</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>reset_Button</tabstop>
   <tabstop>process_Button</tabstop>
-  <tabstop>tableWidget</tabstop>
   <tabstop>Save_Button</tabstop>
   <tabstop>Training_Button</tabstop>
   <tabstop>process_Button</tabstop>
