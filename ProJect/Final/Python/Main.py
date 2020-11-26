@@ -48,16 +48,16 @@ class MyWindow(QMainWindow, UI1.Ui_SAVEBtn):
         self.setWindowIcon(QIcon("./final_icon.png"))
 
         self.Dataset_pushButton.setStyleSheet(
-            'QPushButton{image:url("./dataset2.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("./dataset2.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
+            'QPushButton{image:url("../images/dataset2.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("../images/dataset2.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
         self.Training_pushButton.setStyleSheet(
-            'QPushButton{image:url("./traing3.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("./traing3.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
+            'QPushButton{image:url("../images/traing3.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("../images/traing3.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
         self.Test_pushButton.setStyleSheet(
-            'QPushButton{image:url("./prediction6.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("./prediction6.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
+            'QPushButton{image:url("../images/prediction6.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(60, 71, 81);}QPushButton:hover{image:url("../images/prediction6.webp"); background-color:rgb(25, 35, 45); border-width:5px; border-color: rgb(20, 140, 210);}')
         
         self.arrow1.setStyleSheet(
-            "image:url(./arrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
+            "image:url(../imagesarrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
         self.arrow2.setStyleSheet(
-            "image:url(./arrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
+            "image:url(../imagesarrow1.webp); background-color:rgb(25, 35, 45); border:0px;")
         self.Dataset_pushButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.Training_pushButton.setCursor(QCursor(Qt.PointingHandCursor))
         self.Test_pushButton.setCursor(QCursor(Qt.PointingHandCursor))

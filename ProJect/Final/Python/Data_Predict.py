@@ -74,12 +74,12 @@ class Data_Predict(QDialog, UI4.Ui_Dialog):
         self.show()
 
         self.Import_Data.setStyleSheet(
-            'image:url(./dataset2.webp); background-color:rgb(25,35,45); border-width:5px; ')
+            'image:url(../images/dataset2.webp); background-color:rgb(25,35,45); border-width:5px; ')
         self.Import_Model.setStyleSheet(
-            'image:url(./model1.webp); background-color:rgb(25,35,45); border-width:5px;')
+            'image:url(../images/model1.webp); background-color:rgb(25,35,45); border-width:5px;')
 
         self.predict_pushbutton.setStyleSheet(
-            'image:url(./prediction7.png); background-color:rgb(25,35,45); border-width:5px;'
+            'image:url(../images/prediction7.png); background-color:rgb(25,35,45); border-width:5px;'
         )
 
         # pushbutton
